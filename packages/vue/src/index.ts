@@ -1,2 +1,1 @@
-import { sum } from '@small-vue/reactivity'
-console.log(sum)
+export * from '@small-vue/reactivity'
