@@ -15,7 +15,7 @@
     "lib": ["esnext", "DOM"],
     "types": ["jest"],
     "paths": {
-      "@mini-vue/*": ["packages/*/src"]
+      "@small-vue/*": ["packages/*/src"]
     }
   },
   "include": ["packages/*/src", "packages/*/__tests__"]

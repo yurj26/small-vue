@@ -1,9 +1,23 @@
 {
-  "name": "mini-vue",
+  "name": "samll-vue",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "rollup -c -w",
+    "build": "rollup -c",
+    "test": "jest"
+  },
+  "author": "Yurj",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-node-resolve": "^8.1.0",
+    "@rollup/plugin-replace": "^2.3.3",
+    "@rollup/plugin-typescript": "^8.2.5",
+    "rollup": "^2.17.1",
+    "rollup-plugin-sourcemaps": "^0.6.2",
+    "ts-jest": "^27.0.5",
+    "tslib": "^2.3.1",
     "@babel/core": "^7.18.13",
     "@babel/preset-env": "^7.18.10",
     "@babel/preset-typescript": "^7.18.6",
@@ -11,8 +25,5 @@
     "babel-jest": "^29.0.1",
     "jest": "^29.0.1",
     "typescript": "^4.8.2"
-  },
-  "scripts": {
-    "test": "jest"
   }
 }
