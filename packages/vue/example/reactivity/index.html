@@ -12,7 +12,7 @@
       const obj = { a: 1 }
       const proxy = reactive(obj)
       const proxy2 = reactive(obj)
-      const proxy3 = reactive(proxy2)
+      const proxy3 = reactive(proxy)
       console.log(proxy === proxy2, proxy === proxy3)
     </script>
   </body>

@@ -1,35 +1,36 @@
-import { isObject } from '@small-vue/shared'
-const reactiveMap = new WeakMap()
-const enum ReactiveFlags {
+import { mutableHandlers } from './baseHandlers'
+
+export const reactiveMap = new WeakMap()
+
+export const enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive',
 }
+
 export const reactive = (target) => {
-  if (!isObject(target)) {
-    return
-  }
+  return createReactiveObject(target, reactiveMap, mutableHandlers)
+}
 
-  if (reactiveMap.has(target)) {
-    return reactiveMap.get(target)
-  }
+export function isProxy(value) {
+  return isReactive(value)
+}
 
-  if (target[ReactiveFlags.IS_REACTIVE]) {
+export function isReactive(value) {
+  return !!value[ReactiveFlags.IS_REACTIVE]
+}
+
+function createReactiveObject(target, proxyMap, baseHandlers) {
+  // target被代理过 直接返回
+  if (isProxy(target)) {
     return target
   }
-
-  const proxy = new Proxy(target, {
-    get(target, key, receiver) {
-      if (key === ReactiveFlags.IS_REACTIVE) {
-        return true
-      }
-
-      const result = Reflect.get(target, key, receiver)
-      return result
-    },
-    set(target, key, value, receiver) {
-      const result = Reflect.set(target, key, value, receiver)
-      return result
-    },
-  })
-  reactiveMap.set(target, proxy)
+  // 缓存里存在target 直接返回
+  const existingProxy = proxyMap.get(target)
+  if (existingProxy) {
+    return existingProxy
+  }
+  // 核心原理 proxy代理
+  const proxy = new Proxy(target, baseHandlers)
+  // 缓存代理
+  proxyMap.set(target, proxy)
   return proxy
 }
