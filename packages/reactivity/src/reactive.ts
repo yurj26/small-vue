@@ -32,5 +32,6 @@ function createReactiveObject(target, proxyMap, baseHandlers) {
   const proxy = new Proxy(target, baseHandlers)
   // 缓存代理
   proxyMap.set(target, proxy)
+
   return proxy
 }
