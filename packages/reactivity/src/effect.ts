@@ -1,3 +1,4 @@
+import { createDep } from './dep'
 export let activeEffect = undefined
 const targetMap = new WeakMap()
 
@@ -14,6 +15,8 @@ class ReactiveEffect {
       this.parent = activeEffect as any
       activeEffect = this as any
 
+      cleanupEffect(this)
+
       return this.fn()
     } finally {
       // 重置
@@ -25,6 +28,13 @@ class ReactiveEffect {
       this.active = false
     }
   }
+}
+
+function cleanupEffect(effect) {
+  effect.deps.forEach((dep) => {
+    dep.delete(effect)
+  })
+  effect.deps.length = 0
 }
 
 export function effect(fn) {
@@ -50,25 +60,38 @@ export function track(target, type, key) {
   }
   let dep = depsMap.get(key)
   if (!dep) {
-    depsMap.set(key, (dep = new Set()))
+    dep = createDep()
+    depsMap.set(key, dep)
   }
+  trackEffects(dep)
+}
+function trackEffects(dep) {
   dep.add(activeEffect)
+  ;(activeEffect as any).deps.push(dep)
 }
 // 触发依赖
 export function trigger(target, type, key) {
   console.log('触发依赖', target, type, key)
-  // let deps: Array<any> = []
+  let deps: Array<any> = []
 
   const depsMap = targetMap.get(target)
   if (!depsMap) return
 
-  let effects = depsMap.get(key)
-  if (effects) {
-    effects.forEach((effect) => {
-      // 避免effect重复执行产生递归
-      if (effect !== activeEffect) {
-        effect.run()
-      }
-    })
-  }
+  const dep = depsMap.get(key)
+  deps.push(dep)
+
+  let effects: Array<any> = []
+  deps.forEach((dep) => {
+    // 解构出来为effect
+    effects.push(...dep)
+  })
+  triggerEffects(createDep(effects))
+}
+function triggerEffects(dep) {
+  dep.forEach((effect) => {
+    // 避免effect重复执行产生递归
+    if (effect !== activeEffect) {
+      effect.run()
+    }
+  })
 }

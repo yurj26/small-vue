@@ -12,15 +12,18 @@
 
       const app = document.getElementById('app')
 
-      const data = reactive({ name: 'yrj', age: 10 })
+      const data = reactive({ flag: true, name: 'yrj', age: 10 })
 
       effect(() => {
-        app.innerHTML = data.name + ':' + data.age
+        console.log('fn()')
+        app.innerHTML = data.flag ? data.name : data.age
       })
 
       setTimeout(() => {
-        data.name = 'yrj2'
-        data.age = 10
+        data.flag = false
+        setTimeout(() => {
+          data.name = 'hahahha'
+        }, 1000)
       }, 1000)
     </script>
   </body>
