@@ -1,25 +1,45 @@
-import { ReactiveFlags, reactiveMap, reactive } from './reactive'
+import {
+  ReactiveFlags,
+  reactiveMap,
+  reactive,
+  readonly,
+  readonlyMap,
+} from './reactive'
 import { track, trigger } from './effect'
 import { isObject } from '@small-vue/shared'
 
 const get = createGetter()
 const set = createSetter()
+const readonlyGet = createGetter(true)
 
-function createGetter() {
+function createGetter(isReadonly = false) {
   return function get(target, key, receiver) {
+    const IsExistInReactiveMap = () => {
+      return key === ReactiveFlags.RAW && receiver === reactiveMap.get(target)
+    }
+
+    const IsExistInReadonlyMap = () => {
+      return key === ReactiveFlags.RAW && receiver === readonlyMap.get(target)
+    }
+
     if (key === ReactiveFlags.IS_REACTIVE) {
-      return true
+      return !isReadonly
+    } else if (key === ReactiveFlags.IS_READONLY) {
+      return isReadonly
+    } else if (IsExistInReactiveMap() || IsExistInReadonlyMap()) {
+      return target
     }
 
     const result = Reflect.get(target, key, receiver)
 
-    track(target, 'get', key)
+    if (!isReadonly) {
+      track(target, 'get', key)
+    }
 
     // 判断内部是否为对象，深度代理
     if (isObject(result)) {
-      return reactive(result)
+      return isReadonly ? readonly(result) : reactive(result)
     }
-
     return result
   }
 }
@@ -37,7 +57,26 @@ function createSetter() {
     return result
   }
 }
+
 export const mutableHandlers = {
   get,
   set,
+}
+export const readonlyHandlers = {
+  get: readonlyGet,
+  set(target, key) {
+    // readonly 的响应式对象不可以修改值
+    console.warn(
+      `Set operation on key "${String(key)}" failed: target is readonly.`,
+      target
+    )
+    return true
+  },
+  deleteProperty(target, key) {
+    console.warn(
+      `Delete operation on key "${String(key)}" failed: target is readonly.`,
+      target
+    )
+    return true
+  },
 }

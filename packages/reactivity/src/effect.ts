@@ -51,7 +51,7 @@ export function effect(fn) {
   }
 */
 export function track(target, type, key) {
-  console.log('收集依赖', target, type, key)
+  // console.log('收集依赖', target, type, key)
   if (!activeEffect) return
   let depsMap = targetMap.get(target)
   // 第一次没有
@@ -71,7 +71,7 @@ function trackEffects(dep) {
 }
 // 触发依赖
 export function trigger(target, type, key) {
-  console.log('触发依赖', target, type, key)
+  // console.log('触发依赖', target, type, key)
   let deps: Array<any> = []
 
   const depsMap = targetMap.get(target)

@@ -8,23 +8,24 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import { reactive, effect } from '../../dist/small-vue.esm-bundler.js'
+      import {
+        reactive,
+        effect,
+        readonly,
+      } from '../../dist/small-vue.esm-bundler.js'
 
       const app = document.getElementById('app')
 
-      const data = reactive({ flag: true, name: 'yrj', age: 10 })
-
-      effect(() => {
-        console.log('fn()')
-        app.innerHTML = data.flag ? data.name : data.age
-      })
-
-      setTimeout(() => {
-        data.flag = false
-        setTimeout(() => {
-          data.name = 'hahahha'
-        }, 1000)
-      }, 1000)
+      const obj = {
+        a: 1,
+        b: {
+          a: 1,
+        },
+      }
+      const data = readonly(obj)
+      const data1 = readonly(obj)
+      data.b.a = 2
+      console.log(data === data1)
     </script>
   </body>
 </html>
