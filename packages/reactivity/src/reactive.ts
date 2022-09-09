@@ -1,7 +1,12 @@
-import { mutableHandlers, readonlyHandlers } from './baseHandlers'
+import {
+  mutableHandlers,
+  readonlyHandlers,
+  shallowReactiveHandlers,
+} from './baseHandlers'
 
 export const reactiveMap = new WeakMap()
 export const readonlyMap = new WeakMap()
+export const shallowReactiveMap = new WeakMap()
 
 export const enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive', // 标记一个响应式对象
@@ -16,7 +21,15 @@ export const reactive = (target) => {
 }
 
 export const readonly = (target) => {
-  return createReactiveObject(target, reactiveMap, readonlyHandlers)
+  return createReactiveObject(target, readonlyMap, readonlyHandlers)
+}
+
+export const shallowReactive = (target) => {
+  return createReactiveObject(
+    target,
+    shallowReactiveMap,
+    shallowReactiveHandlers
+  )
 }
 
 export function isProxy(value) {

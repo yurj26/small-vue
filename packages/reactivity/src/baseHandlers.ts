@@ -9,10 +9,13 @@ import { track, trigger } from './effect'
 import { isObject } from '@small-vue/shared'
 
 const get = createGetter()
-const set = createSetter()
+const shallowGet = createGetter(false, true)
 const readonlyGet = createGetter(true)
 
-function createGetter(isReadonly = false) {
+const set = createSetter()
+const shallowSet = createSetter(true)
+
+function createGetter(isReadonly = false, shallow = false) {
   return function get(target, key, receiver) {
     const IsExistInReactiveMap = () => {
       return key === ReactiveFlags.RAW && receiver === reactiveMap.get(target)
@@ -36,6 +39,10 @@ function createGetter(isReadonly = false) {
       track(target, 'get', key)
     }
 
+    if (shallow) {
+      return result
+    }
+
     // 判断内部是否为对象，深度代理
     if (isObject(result)) {
       return isReadonly ? readonly(result) : reactive(result)
@@ -44,7 +51,7 @@ function createGetter(isReadonly = false) {
   }
 }
 
-function createSetter() {
+function createSetter(shallow = false) {
   return function set(target, key, value, receiver) {
     let oldValue = target[key]
     const result = Reflect.set(target, key, value, receiver)
@@ -62,6 +69,12 @@ export const mutableHandlers = {
   get,
   set,
 }
+
+export const shallowReactiveHandlers = {
+  get: shallowGet,
+  set: shallowSet,
+}
+
 export const readonlyHandlers = {
   get: readonlyGet,
   set(target, key) {
