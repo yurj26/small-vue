@@ -2,11 +2,13 @@ import {
   mutableHandlers,
   readonlyHandlers,
   shallowReactiveHandlers,
+  shallowReadonlyHandlers,
 } from './baseHandlers'
 
 export const reactiveMap = new WeakMap()
 export const readonlyMap = new WeakMap()
 export const shallowReactiveMap = new WeakMap()
+export const shallowReadonlyMap = new WeakMap()
 
 export const enum ReactiveFlags {
   IS_REACTIVE = '__v_isReactive', // 标记一个响应式对象
@@ -29,6 +31,14 @@ export const shallowReactive = (target) => {
     target,
     shallowReactiveMap,
     shallowReactiveHandlers
+  )
+}
+
+export const shallowReadonly = (target) => {
+  return createReactiveObject(
+    target,
+    shallowReadonlyMap,
+    shallowReadonlyHandlers
   )
 }
 

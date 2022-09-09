@@ -4,13 +4,16 @@ import {
   reactive,
   readonly,
   readonlyMap,
+  shallowReactiveMap,
+  shallowReadonlyMap,
 } from './reactive'
 import { track, trigger } from './effect'
-import { isObject } from '@small-vue/shared'
+import { isObject, extend } from '@small-vue/shared'
 
 const get = createGetter()
 const shallowGet = createGetter(false, true)
 const readonlyGet = createGetter(true)
+const shallowReadonlyGet = createGetter(true, true)
 
 const set = createSetter()
 const shallowSet = createSetter(true)
@@ -25,11 +28,24 @@ function createGetter(isReadonly = false, shallow = false) {
       return key === ReactiveFlags.RAW && receiver === readonlyMap.get(target)
     }
 
+    const isExistInShallowReactiveMap = () =>
+      key === ReactiveFlags.RAW && receiver === shallowReactiveMap.get(target)
+
+    const isExistInShallowReadonlyMap = () =>
+      key === ReactiveFlags.RAW && receiver === shallowReadonlyMap.get(target)
+
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadonly
     } else if (key === ReactiveFlags.IS_READONLY) {
       return isReadonly
-    } else if (IsExistInReactiveMap() || IsExistInReadonlyMap()) {
+    } else if (key === ReactiveFlags.IS_SHALLOW) {
+      return shallow
+    } else if (
+      IsExistInReactiveMap() ||
+      IsExistInReadonlyMap() ||
+      isExistInShallowReactiveMap() ||
+      isExistInShallowReadonlyMap()
+    ) {
       return target
     }
 
@@ -47,6 +63,7 @@ function createGetter(isReadonly = false, shallow = false) {
     if (isObject(result)) {
       return isReadonly ? readonly(result) : reactive(result)
     }
+
     return result
   }
 }
@@ -93,3 +110,7 @@ export const readonlyHandlers = {
     return true
   },
 }
+
+export const shallowReadonlyHandlers = extend({}, readonlyHandlers, {
+  get: shallowReadonlyGet,
+})
