@@ -57,6 +57,14 @@ export function isReadonly(value) {
 export function isShallow(value) {
   return !!value[ReactiveFlags.IS_SHALLOW]
 }
+
+export function toRaw(value) {
+  if (!value[ReactiveFlags.RAW]) {
+    return value
+  }
+  return value[ReactiveFlags.RAW]
+}
+
 function createReactiveObject(target, proxyMap, baseHandlers) {
   // target被代理过，直接返回
   if (

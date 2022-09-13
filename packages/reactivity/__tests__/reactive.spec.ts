@@ -1,4 +1,4 @@
-import { reactive, isReactive, isProxy } from '../src/reactive'
+import { reactive, isReactive, isProxy, toRaw } from '../src/reactive'
 describe('reactive', () => {
   test('Object', () => {
     const obj = {
@@ -32,5 +32,20 @@ describe('reactive', () => {
     expect(isReactive(proxy.nested)).toBe(true)
     expect(isReactive(proxy.arr)).toBe(true)
     expect(isReactive(proxy.arr[0])).toBe(true)
+  })
+
+  test('toRaw', () => {
+    const obj = {
+      name: 'yrj',
+      age: 18,
+      nested: {
+        foo: 1,
+      },
+      arr: [{ foo: 1 }],
+    }
+    const proxy = reactive(obj)
+
+    expect(toRaw(proxy)).toBe(obj)
+    expect(toRaw(obj)).toBe(obj)
   })
 })
