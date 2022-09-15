@@ -8,7 +8,7 @@ class ReactiveEffect {
   public deps = []
   public active = true
   public onStop?: () => void
-  constructor(public fn) {}
+  constructor(public fn, public scheduler?) {}
   run() {
     if (!this.active) return this.fn()
 
@@ -106,7 +106,12 @@ function triggerEffects(dep) {
   dep.forEach((effect) => {
     // 避免effect重复执行产生递归
     if (effect !== activeEffect) {
-      effect.run()
+      if (effect.scheduler) {
+        // 执行用户自己的
+        effect.scheduler()
+      } else {
+        effect.run()
+      }
     }
   })
 }
