@@ -1,4 +1,5 @@
 import { createDep } from './dep'
+import { extend } from '@small-vue/shared'
 export let activeEffect = undefined
 const targetMap = new WeakMap()
 
@@ -6,6 +7,7 @@ class ReactiveEffect {
   public parent = null
   public deps = []
   public active = true
+  public onStop?: () => void
   constructor(public fn) {}
   run() {
     if (!this.active) return this.fn()
@@ -25,6 +27,10 @@ class ReactiveEffect {
   }
   stop() {
     if (this.active) {
+      cleanupEffect(this)
+      if (this.onStop) {
+        this.onStop()
+      }
       this.active = false
     }
   }
@@ -37,9 +43,18 @@ function cleanupEffect(effect) {
   effect.deps.length = 0
 }
 
-export function effect(fn) {
+export function stop(runner) {
+  runner.effect.stop()
+}
+
+export function effect(fn, options: any = {}) {
   const _effect = new ReactiveEffect(fn)
+  extend(_effect, options)
   _effect.run()
+
+  const runner: any = _effect.run.bind(_effect)
+  runner.effect = _effect
+  return runner
 }
 /*
   收集依赖

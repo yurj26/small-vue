@@ -5,4 +5,4 @@ export {
   shallowReadonly,
   toRaw,
 } from './reactive'
-export { effect } from './effect'
+export { effect, stop } from './effect'

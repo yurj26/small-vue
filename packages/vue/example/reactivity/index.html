@@ -14,28 +14,23 @@
         readonly,
         shallowReactive,
         shallowReadonly,
+        stop,
       } from '../../dist/small-vue.esm-bundler.js'
 
       const app = document.getElementById('app')
 
       const obj = {
         name: 'yyy',
-        foo: {
-          age: 1,
-        },
       }
-      const data = shallowReadonly(obj)
-      const data2 = shallowReadonly(obj)
-      const data3 = shallowReadonly(data2)
+      const data = reactive(obj)
 
-      effect(() => {
-        app.innerHTML = data.foo.age
+      const runner = effect(() => {
+        app.innerHTML = data.name
       })
-
-      setTimeout(() => {
-        data.foo.age = 123
-      }, 1000)
-      console.log(data === data3)
+      data.name = 'aaa'
+      stop(runner)
+      data.name = 'bbb'
+      runner()
     </script>
   </body>
 </html>
