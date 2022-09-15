@@ -1,6 +1,7 @@
 import { createDep } from './dep'
 import { extend } from '@small-vue/shared'
 export let activeEffect = undefined
+let shouldTrack = false
 const targetMap = new WeakMap()
 
 class ReactiveEffect {
@@ -14,15 +15,17 @@ class ReactiveEffect {
 
     try {
       // 收集依赖
+      shouldTrack = true
       this.parent = activeEffect as any
       activeEffect = this as any
 
-      cleanupEffect(this)
+      // cleanupEffect(this)
 
       return this.fn()
     } finally {
       // 重置
       activeEffect = this.parent as any
+      shouldTrack = false
     }
   }
   stop() {
@@ -80,9 +83,11 @@ export function track(target, type, key) {
   }
   trackEffects(dep)
 }
-function trackEffects(dep) {
-  dep.add(activeEffect)
-  ;(activeEffect as any).deps.push(dep)
+export function trackEffects(dep) {
+  if (!dep.has(activeEffect)) {
+    dep.add(activeEffect)
+    ;(activeEffect as any).deps.push(dep)
+  }
 }
 // 触发依赖
 export function trigger(target, type, key) {
@@ -102,7 +107,10 @@ export function trigger(target, type, key) {
   })
   triggerEffects(createDep(effects))
 }
-function triggerEffects(dep) {
+export function isTracking() {
+  return shouldTrack && activeEffect !== undefined
+}
+export function triggerEffects(dep) {
   dep.forEach((effect) => {
     // 避免effect重复执行产生递归
     if (effect !== activeEffect) {

@@ -15,22 +15,18 @@
         shallowReactive,
         shallowReadonly,
         stop,
+        ref,
       } from '../../dist/small-vue.esm-bundler.js'
 
       const app = document.getElementById('app')
-
-      const obj = {
-        name: 'yyy',
-      }
-      const data = reactive(obj)
-
-      const runner = effect(() => {
-        app.innerHTML = data.name
+      const refData = ref(1)
+      effect(() => {
+        app.innerHTML = refData.value
       })
-      data.name = 'aaa'
-      stop(runner)
-      data.name = 'bbb'
-      runner()
+      setTimeout(() => {
+        refData.value = 2
+      }, 1000)
+      console.log(refData)
     </script>
   </body>
 </html>
