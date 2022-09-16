@@ -7,6 +7,7 @@ export class RefImpl {
   public _value: any
   public _rawValue: any
   public dep
+  public __v_isRef = true
 
   constructor(value) {
     this._rawValue = value
@@ -50,4 +51,8 @@ function createRef(value) {
 
 export function ref(value) {
   return createRef(value)
+}
+
+export function isRef(value) {
+  return !!value.__v_isRef
 }

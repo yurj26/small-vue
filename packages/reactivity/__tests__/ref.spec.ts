@@ -1,5 +1,5 @@
 import { effect } from '../src/effect'
-import { ref } from '../src/ref'
+import { isRef, ref } from '../src/ref'
 
 describe('ref', () => {
   it('should be reactive', () => {
@@ -32,5 +32,12 @@ describe('ref', () => {
     expect(dummy).toBe(1)
     a.value.count = 2
     expect(dummy).toBe(2)
+  })
+
+  it('isRef', () => {
+    const a = ref(1)
+    const b = 1
+    expect(isRef(a)).toBe(true)
+    expect(isRef(b)).toBe(false)
   })
 })
