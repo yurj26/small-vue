@@ -1,7 +1,7 @@
 import { isObject, hasChanged } from '@small-vue/shared'
 import { createDep } from './dep'
 import { isTracking, trackEffects, triggerEffects } from './effect'
-import { reactive } from './reactive'
+import { isReactive, reactive } from './reactive'
 
 export class RefImpl {
   public _value: any
@@ -59,4 +59,26 @@ export function isRef(value) {
 
 export function unRef(ref) {
   return isRef(ref) ? ref.value : ref
+}
+
+const shallowUnwrapHandlers = {
+  get(target, key, receiver) {
+    const result = Reflect.get(target, key, receiver)
+    return unRef(result)
+  },
+
+  set(target, key, value, receiver) {
+    const oldValue = target[key]
+    if (isRef(oldValue) && !isRef(value)) {
+      return (target[key].value = value)
+    } else {
+      return Reflect.set(target, key, value, receiver)
+    }
+  },
+}
+
+export function proxyRefs(objectWithRefs) {
+  return isReactive(objectWithRefs)
+    ? objectWithRefs
+    : new Proxy(objectWithRefs, shallowUnwrapHandlers)
 }
