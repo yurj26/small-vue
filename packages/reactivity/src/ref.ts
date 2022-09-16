@@ -56,3 +56,7 @@ export function ref(value) {
 export function isRef(value) {
   return !!value.__v_isRef
 }
+
+export function unRef(ref) {
+  return isRef(ref) ? ref.value : ref
+}
