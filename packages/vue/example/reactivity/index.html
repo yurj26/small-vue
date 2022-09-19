@@ -16,17 +16,27 @@
         shallowReadonly,
         stop,
         ref,
+        computed,
       } from '../../dist/small-vue.esm-bundler.js'
 
       const app = document.getElementById('app')
-      const refData = ref(1)
-      effect(() => {
-        app.innerHTML = refData.value
+
+      const value = reactive({
+        foo: 1,
       })
+
+      const getter = computed(() => {
+        return value.foo
+      })
+
+      effect(() => {
+        app.innerHTML = getter.value
+      })
+
       setTimeout(() => {
-        refData.value = 2
-      }, 1000)
-      console.log(refData)
+        value.foo = 2
+      }, 2000)
+      console.log(getter.value)
     </script>
   </body>
 </html>

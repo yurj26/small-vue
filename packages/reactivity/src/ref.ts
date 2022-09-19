@@ -30,13 +30,13 @@ export class RefImpl {
   }
 }
 
-function trackRefValue(ref) {
+export function trackRefValue(ref) {
   if (isTracking()) {
     trackEffects(ref.dep)
   }
 }
 
-function triggerRefValue(ref) {
+export function triggerRefValue(ref) {
   triggerEffects(ref.dep)
 }
 

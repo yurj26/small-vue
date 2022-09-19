@@ -7,3 +7,4 @@ export {
 } from './reactive'
 export { effect, stop } from './effect'
 export { ref } from './ref'
+export { computed } from './computed'

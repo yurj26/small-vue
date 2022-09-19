@@ -4,7 +4,7 @@ export let activeEffect = undefined
 let shouldTrack = false
 const targetMap = new WeakMap()
 
-class ReactiveEffect {
+export class ReactiveEffect {
   public parent = null
   public deps = []
   public active = true
