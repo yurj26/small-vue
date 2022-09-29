@@ -6,16 +6,24 @@
     <title>Document</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <button>btn</button>
+    </div>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script type="module">
-      import { nodeOps } from '../../dist/small-vue.esm-bundler.js'
+      import { nodeOps, patchProp } from '../../dist/small-vue.esm-bundler.js'
 
       
       const app = document.getElementById('app')
       const { createRenderer, h, render } = Vue
-
-      const renderer = createRenderer(nodeOps)
-      renderer.render(h('h1', 'hello world'), app)
+      
+      const renderOps = Object.assign({patchProp}, nodeOps)
+      const renderer = createRenderer(renderOps)
+      
+      let clickFn = () => {
+         console.log('click')
+      }
+      
+      renderer.render(h('h1', {style: {color:'red'}, class:'class', onClick: clickFn}, 'hello world'), app)
     </script>
 </html>

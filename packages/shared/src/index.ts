@@ -7,3 +7,6 @@ export const extend = Object.assign
 export function hasChanged(value, oldValue) {
   return !Object.is(value, oldValue)
 }
+
+const onRE = /^on[^a-z]/
+export const isOn = (key: string) => onRE.test(key)
