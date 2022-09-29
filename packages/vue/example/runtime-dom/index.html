@@ -7,11 +7,10 @@
   </head>
   <body>
     <div id="app">
-      <button>btn</button>
     </div>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script type="module">
-      import { nodeOps, patchProp } from '../../dist/small-vue.esm-bundler.js'
+      import { nodeOps, patchProp,createVNode } from '../../dist/small-vue.esm-bundler.js'
 
       
       const app = document.getElementById('app')
@@ -23,7 +22,21 @@
       let clickFn = () => {
          console.log('click')
       }
-      
-      renderer.render(h('h1', {style: {color:'red'}, class:'class', onClick: clickFn}, 'hello world'), app)
+
+      const hOpts = [
+        'h1', 
+        { 
+          style: { color:'red' }, 
+          class:'class', 
+          onClick: clickFn 
+        }, 
+        'hello'
+      ]
+
+      renderer.render(h(...hOpts), app)
+
+
+      console.log('createVNode', createVNode(...hOpts))
+
     </script>
 </html>
