@@ -10,11 +10,11 @@
     </div>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script type="module">
-      import { nodeOps, patchProp,createVNode } from '../../dist/small-vue.esm-bundler.js'
+      import { nodeOps, patchProp,createVNode, h } from '../../dist/small-vue.esm-bundler.js'
 
       
       const app = document.getElementById('app')
-      const { createRenderer, h, render } = Vue
+      const { createRenderer, h: hh, render } = Vue
       
       const renderOps = Object.assign({patchProp}, nodeOps)
       const renderer = createRenderer(renderOps)
@@ -30,13 +30,12 @@
           class:'class', 
           onClick: clickFn 
         }, 
-        'hello'
+        [h('h1'), h('h1')],
       ]
 
       renderer.render(h(...hOpts), app)
 
-
-      console.log('createVNode', createVNode(...hOpts))
+      console.log('createVNode', h(...hOpts))
 
     </script>
 </html>
