@@ -144,7 +144,7 @@ export const createRenderer = renderOptions => {
         // array -> array  diff
         if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
           console.log('array -> array')
-          // patchKeyedChildren()
+          patchKeyedChildren(n1.children, n2.children, container, anchor)
         } else {
           // array -> null
           console.log('array -> null')
@@ -166,6 +166,76 @@ export const createRenderer = renderOptions => {
         }
       }
     }
+  }
+
+  function patchKeyedChildren(c1, c2, container, anchor) {
+    let i = 0
+    let e1 = c1.length - 1
+    let e2 = c2.length - 1
+
+    // (a, b)
+    // (a, b) c
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i]
+      const n2 = c2[i]
+
+      if (isSameVNodeType(n1, n2)) {
+        console.log('11')
+        // 比对子元素
+        patch(n1, n2, container, anchor)
+      } else {
+        break
+      }
+      i++
+    }
+
+    // (a, b)
+    // c, (a, b)
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1]
+      const n2 = c2[e2]
+
+      if (isSameVNodeType(n1, n2)) {
+        console.log('11')
+        // 比对子元素
+        patch(n1, n2, container, anchor)
+      } else {
+        break
+      }
+      e1--
+      e2--
+    }
+    // patch
+    // (a b)
+    // (a b) c
+    // i = 2, e1 = 1, e2 = 2
+    // (a b)
+    // c (a b)
+    // i = 0, e1 = -1, e2 = 0
+    if (i > e1 && i <= e2) {
+      const nextPos = e2 + 1
+      const anchor = c2[nextPos]?.el || null
+      while (i <= e2) {
+        // 插入节点
+        patch(null, c2[i], container, anchor)
+        i++
+      }
+    }
+    // remove
+    // (a b) c
+    // (a b)
+    // i = 2, e1 = 2, e2 = 1
+    // a (b c)
+    // (b c)
+    // i = 0, e1 = 0, e2 = -1
+    else if (i > e2 && i <= e1) {
+      while (i <= e1) {
+        hostRemove(c1[i].el)
+        i++
+      }
+    }
+
+    console.log(`i:${i}-----e1:${e1}-----e2:${e2}`)
   }
 
   function mountChildren(children, container) {

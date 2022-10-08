@@ -16,15 +16,36 @@
       const app = document.getElementById('app')
 
       const options = Object.assign({ patchProp }, nodeOps)
-      createRenderer(options).render(
-        // [h('h1', 123)]
-        h('h1',{ style: {'fontSize':'100px'}, key: 'aaa'}, '123')
-      , app)
+      createRenderer(options).
+        render(
+          h(
+            'div',
+            { key: 'A' },
+            [
+              h('li', { key: 'a' }, 'a'),
+              h('li', { key: 'b' }, 'b'),
+              h('li', { key: 'c' }, 'c'),
+            ]
+          )
+          , app
+        )
 
       setTimeout(function() {
-        createRenderer(options).render(
-        h('h1', {style: {color:'red'}, key: 'aaa'}, [])
-      , app)
+        createRenderer(options).
+          render(
+            h(
+              'div',
+              { key: 'A' },
+              [
+
+                h('li', { key: 'a' }, 'a'),
+                h('li', { key: 'b' }, 'b'),
+                h('li', { key: 'c' }, 'c'),
+                h('li', { key: 'd' }, 'd'),
+              ]
+            )
+            , app
+          )
       }, 1000);
 
     </script>
