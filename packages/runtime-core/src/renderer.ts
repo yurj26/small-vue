@@ -81,6 +81,8 @@ export const createRenderer = renderOptions => {
     const el = (n2.el = n1.el)
     // 比对属性
     patchProps(el, oldProps, newProps)
+    // 比对children
+    patchChildren(n1, n2, el, anchor)
   }
 
   function patchProps(el, oldProps, newProps) {
@@ -99,6 +101,68 @@ export const createRenderer = renderOptions => {
           if (!(key in newProps)) {
             hostPatchProp(el, key, oldProps[key], null)
           }
+        }
+      }
+    }
+  }
+
+  function patchChildren(n1, n2, container, anchor) {
+    const { shapeFlag: prevShapeFlag, children: c1 } = n1
+    const { shapeFlag, children: c2 } = n2
+    // children type: array | text | null
+    // prev      new
+    // array     array
+    // text  ->  text
+    // null      null
+
+    // array -> text 删除元素，设置文本内容
+    // text -> text  更新文本
+    // null -> text  更新文本
+
+    // array -> array diff算法，比较元素
+    // text -> array  清空文本，进行挂载
+    // null -> array  进行挂载
+
+    // array -> null 删除元素
+    // text -> null  清空文本
+    // null -> null  无处理
+
+    // array | text -> text
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      // prev children: array
+      if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        // unmountChildren()
+        console.log('array -> text')
+      }
+      if (c1 !== c2) {
+        console.log('text -> text')
+        hostSetElementText(container, c2)
+      }
+    } else {
+      // prev children: array
+      if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        // array -> array  diff
+        if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+          console.log('array -> array')
+          // patchKeyedChildren()
+        } else {
+          // array -> null
+          console.log('array -> null')
+          // unmountChildren()
+        }
+      } else {
+        //prev children: text
+
+        // text -> array | null
+        if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+          console.log('text -> null')
+          hostSetElementText(container, '')
+        }
+
+        // text -> array
+        if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+          console.log('text -> array')
+          mountChildren(c2, container)
         }
       }
     }
