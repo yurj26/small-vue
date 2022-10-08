@@ -3,18 +3,18 @@ export const nodeOps = {
     parent.insertBefore(children, anchor || null)
   },
 
-  remove: (child) => {
+  remove: child => {
     const parent = child.parentNode
     if (parent) {
       parent.removeChild(child)
     }
   },
 
-  createElement: (el) => document.createElement(el),
+  createElement: el => document.createElement(el),
 
-  createText: (text) => document.createTextNode(text),
+  createText: text => document.createTextNode(text),
 
-  createComment: (text) => document.createComment(text),
+  createComment: text => document.createComment(text),
 
   setText: (node, text) => {
     node.nodeValue = text
@@ -24,9 +24,9 @@ export const nodeOps = {
     node.textContent = text
   },
 
-  parentNode: (node) => node.parentNode || null,
+  parentNode: node => node.parentNode || null,
 
-  nextSibling: (node) => node.nextSibling,
+  nextSibling: node => node.nextSibling,
 
-  querySelector: (selector) => document.querySelector(selector),
+  querySelector: selector => document.querySelector(selector)
 }

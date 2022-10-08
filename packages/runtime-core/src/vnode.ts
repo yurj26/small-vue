@@ -4,6 +4,11 @@ export function isVNode(value) {
   return value?.__v_isVNode
 }
 
+// 用 symbol 作为唯一标识
+export const Text = Symbol('Text')
+
+export const Fragment = Symbol('Fragment')
+
 export function createVNode(type, props?: any, children?: any) {
   const shapeFlag = isString(type) ? ShapeFlags.ELEMENT : 0
 

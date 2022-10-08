@@ -10,15 +10,15 @@
     </div>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script type="module">
-      import { nodeOps, patchProp,createVNode, h, createRenderer} from '../../dist/small-vue.esm-bundler.js'
+      import { nodeOps, patchProp,createVNode, h, createRenderer, Text } from '../../dist/small-vue.esm-bundler.js'
 
       
       const app = document.getElementById('app')
 
       const options = Object.assign({ patchProp }, nodeOps)
-      
-      createRenderer(options).render(h('h1', { style: { color: 'red' }, onClick: () => alert(111) }, 'text'), app)
-  
+      createRenderer(options).render(
+        h('h1', { style: {color: 'red'}}, [h('li', 123)])
+      , app)
 
     </script>
 </html>

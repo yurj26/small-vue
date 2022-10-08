@@ -1,3 +1,3 @@
 export { h } from './h'
-export { createVNode } from './vnode'
+export { createVNode, Text } from './vnode'
 export { createRenderer } from './renderer'
