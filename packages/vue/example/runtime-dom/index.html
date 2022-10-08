@@ -17,8 +17,14 @@
 
       const options = Object.assign({ patchProp }, nodeOps)
       createRenderer(options).render(
-        h('h1', { style: {color: 'red'}}, [h('li', 123)])
+        h('h1',{ style: {'fontSize':'100px'}, key: 'aaa'}, '123')
       , app)
+
+      setTimeout(function() {
+        createRenderer(options).render(
+        h('h1', {style: {color:'red'}, key: 'aaa'}, '222')
+      , app)
+      }, 1000);
 
     </script>
 </html>

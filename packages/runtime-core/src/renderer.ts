@@ -1,5 +1,5 @@
 import { ShapeFlags } from '@small-vue/shared'
-import { Text } from './vnode'
+import { isSameVNodeType, Text } from './vnode'
 export const createRenderer = renderOptions => {
   const {
     createElement: hostCreateElement,
@@ -12,10 +12,28 @@ export const createRenderer = renderOptions => {
   } = renderOptions
 
   const render = (vnode, container) => {
-    patch(null, vnode, container)
+    console.log('调用 patch')
+    if (vnode == null) {
+      // 卸载节点
+      if (container._vnode) {
+        // unmount()
+      }
+    } else {
+      patch(container._vnode || null, vnode, container)
+    }
+    container._vnode = vnode
   }
 
   function patch(n1, n2, container = null, anchor = null) {
+    if (n1 === n2) {
+      return
+    }
+    // 如果vnode不是同一类型，卸载老节点
+    if (n1 && !isSameVNodeType(n1, n2)) {
+      console.log('!isSameVNodeType')
+      // unmount()
+      n1 = null
+    }
     // 渲染核心逻辑
     const { type, shapeFlag } = n2
 
@@ -52,7 +70,39 @@ export const createRenderer = renderOptions => {
     hostInsert(el, container)
   }
 
-  function updateElement(n1, n2, container, abc) {}
+  function patchElement(n1, n2, container, anchor) {
+    console.log('oldVNode', n1)
+    console.log('newVNode', n2)
+
+    const oldProps = n1?.props || {}
+    const newProps = n2?.props || {}
+
+    // 需要把 el 挂载到新的 vnode
+    const el = (n2.el = n1.el)
+    // 比对属性
+    patchProps(el, oldProps, newProps)
+  }
+
+  function patchProps(el, oldProps, newProps) {
+    if (oldProps !== newProps) {
+      // { id: 1 } -> { id: 2 }
+      for (let key in newProps) {
+        const next = newProps[key]
+        const pre = oldProps[key]
+        if (next !== pre) {
+          hostPatchProp(el, key, pre, next)
+        }
+      }
+      // { id: 1, uId: 2} -> { id: 1 }
+      if (oldProps) {
+        for (let key in oldProps) {
+          if (!(key in newProps)) {
+            hostPatchProp(el, key, oldProps[key], null)
+          }
+        }
+      }
+    }
+  }
 
   function mountChildren(children, container) {
     // 递归子元素 创建
@@ -63,7 +113,7 @@ export const createRenderer = renderOptions => {
 
   function processText(n1, n2, container) {
     // 文本元素节点的创建和更新
-    if (n1 === null) {
+    if (n1 == null) {
       hostInsert((n2.el = hostCreateText(n2.children)), container)
     } else {
       const el = (n2.el = n1.el)
@@ -79,7 +129,7 @@ export const createRenderer = renderOptions => {
       mountElement(n2, container, anchor)
     } else {
       // 更新节点
-      updateElement(n1, n2, container, anchor)
+      patchElement(n1, n2, container, anchor)
     }
   }
 

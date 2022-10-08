@@ -4,6 +4,10 @@ export function isVNode(value) {
   return value?.__v_isVNode
 }
 
+export function isSameVNodeType(n1, n2) {
+  return n1.type === n2.type && n1.key === n2.key
+}
+
 // 用 symbol 作为唯一标识
 export const Text = Symbol('Text')
 
@@ -19,7 +23,7 @@ export function createVNode(type, props?: any, children?: any) {
     key: props?.key,
     children,
     el: null, //真实节点
-    shapeFlag,
+    shapeFlag
   }
 
   if (children) {
