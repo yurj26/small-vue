@@ -20,11 +20,39 @@
         render(
           h(
             'div',
-            { key: 'A' },
+            { key: 'B', class: 'old' },
             [
               h('li', { key: 'a' }, 'a'),
               h('li', { key: 'b' }, 'b'),
+
               h('li', { key: 'c' }, 'c'),
+              h('li', { key: 'd' }, 'd'),
+              h('li', { key: 'e' }, 'e'),
+
+              h('li', { key: 'f' }, 'f'),
+              h('li', { key: 'g' }, 'g'),
+            ]
+          )
+          , app
+        )
+
+
+
+      createRenderer(options).
+        render(
+          h(
+            'div',
+            { key: 'A', class: 'old' },
+            [
+              h('li', { key: 'a' }, 'a'),
+              h('li', { key: 'b' }, 'b'),
+
+              h('li', { key: 'c' }, 'c'),
+              h('li', { key: 'd' }, 'd'),
+              h('li', { key: 'e' }, 'e'),
+
+              h('li', { key: 'f' }, 'f'),
+              h('li', { key: 'g' }, 'g'),
             ]
           )
           , app
@@ -35,18 +63,43 @@
           render(
             h(
               'div',
-              { key: 'A' },
+              { key: 'A', class: 'new' },
               [
-
                 h('li', { key: 'a' }, 'a'),
                 h('li', { key: 'b' }, 'b'),
-                h('li', { key: 'c' }, 'c'),
+
+                h('li', { key: 'e' }, 'e'),
                 h('li', { key: 'd' }, 'd'),
+                h('li', { key: 'c' }, 'c'),
+                h('li', { key: 'h' }, 'h'),
+
+                h('li', { key: 'f' }, 'f'),
+                h('li', { key: 'g' }, 'g'),
               ]
             )
             , app
           )
-      }, 1000);
+      }, 500);
 
     </script>
+    <style>
+      .old, .new {
+        display: flex;
+      }
+
+      li {
+        list-style: none;
+        display: inline-block;
+        margin: 10px;
+        width: 50px;
+        height: 50px;
+        background: green;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+      }
+    </style>
 </html>

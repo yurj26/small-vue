@@ -67,12 +67,12 @@ export const createRenderer = renderOptions => {
       }
     }
 
-    hostInsert(el, container)
+    hostInsert(el, container, anchor)
   }
 
   function patchElement(n1, n2, container, anchor) {
-    console.log('oldVNode', n1)
-    console.log('newVNode', n2)
+    // console.log('oldVNode', n1)
+    // console.log('newVNode', n2)
 
     const oldProps = n1?.props || {}
     const newProps = n2?.props || {}
@@ -170,9 +170,11 @@ export const createRenderer = renderOptions => {
 
   function patchKeyedChildren(c1, c2, container, anchor) {
     let i = 0
+    const l2 = c2.length
     let e1 = c1.length - 1
-    let e2 = c2.length - 1
+    let e2 = l2 - 1
 
+    // sync from start
     // (a, b)
     // (a, b) c
     while (i <= e1 && i <= e2) {
@@ -180,7 +182,6 @@ export const createRenderer = renderOptions => {
       const n2 = c2[i]
 
       if (isSameVNodeType(n1, n2)) {
-        console.log('11')
         // 比对子元素
         patch(n1, n2, container, anchor)
       } else {
@@ -189,6 +190,7 @@ export const createRenderer = renderOptions => {
       i++
     }
 
+    // sync from end
     // (a, b)
     // c, (a, b)
     while (i <= e1 && i <= e2) {
@@ -196,7 +198,6 @@ export const createRenderer = renderOptions => {
       const n2 = c2[e2]
 
       if (isSameVNodeType(n1, n2)) {
-        console.log('11')
         // 比对子元素
         patch(n1, n2, container, anchor)
       } else {
@@ -205,7 +206,7 @@ export const createRenderer = renderOptions => {
       e1--
       e2--
     }
-    // patch
+    // common sequence + mount
     // (a b)
     // (a b) c
     // i = 2, e1 = 1, e2 = 2
@@ -214,14 +215,14 @@ export const createRenderer = renderOptions => {
     // i = 0, e1 = -1, e2 = 0
     if (i > e1 && i <= e2) {
       const nextPos = e2 + 1
-      const anchor = c2[nextPos]?.el || null
+      const anchor = nextPos < l2 ? c2[nextPos].el : null
       while (i <= e2) {
         // 插入节点
         patch(null, c2[i], container, anchor)
         i++
       }
     }
-    // remove
+    // common sequence + unmount
     // (a b) c
     // (a b)
     // i = 2, e1 = 2, e2 = 1
@@ -234,8 +235,90 @@ export const createRenderer = renderOptions => {
         i++
       }
     }
+    // unknown sequence
+    // a b [c d e] f g
+    // a b [e d c h] f g
+    // i = 2, e1 = 4, e2 = 5
+    else {
+      let s1 = i
+      let s2 = i
 
-    console.log(`i:${i}-----e1:${e1}-----e2:${e2}`)
+      const keyToNewIndexMap = new Map()
+      // { e:2, d:3, c:4, h:5 }
+      for (let i = s2; i <= e2; i++) {
+        const nextChild = c2[i]
+        if (nextChild != null) {
+          keyToNewIndexMap.set(c2[i].key, i)
+        }
+      }
+      console.log('keyToNewIndexMap', keyToNewIndexMap)
+
+      // 已经patch的节点个数
+      let patched = 0
+      // 需要patch的节点个数
+      // 5 - 2 + 1 = 4  对应的 [e d c h]
+      const toBePatched = e2 - s2 + 1
+      // 判断节点是否需要移动
+      let moved = false
+      // 记录节点是否移动
+      let maxNewIndexSoFar = 0
+      // 新序列节点在旧序列节点中对应的下标
+      // [0,0,0,0]
+      const newIndexToOldIndexMap = new Array(toBePatched).fill(0)
+      // 遍历旧序列的子节点
+      for (let i = s1; i <= e1; i++) {
+        const prevChild = c1[i]
+        // 所有新节点已经被patch，移除旧的
+        if (patched >= toBePatched) {
+          hostRemove(prevChild.el)
+          continue
+        }
+        // 在新序列中该旧节点对应的下标
+        let newIndex
+        if (prevChild.key != null) {
+          newIndex = keyToNewIndexMap.get(prevChild.key)
+        } else {
+          // 如果没有key，找到相同类型的
+          for (let j = s2; j <= e2; j++) {
+            if (
+              newIndexToOldIndexMap[j - s2] === 0 &&
+              isSameVNodeType(prevChild, c2[j])
+            ) {
+              newIndex = j
+              break
+            }
+          }
+        }
+        // 如果在新序列中没有找到下标，删除该节点
+        if (newIndex === undefined) {
+          hostRemove(prevChild.el)
+        } else {
+          // 新序列节点在旧序列节点的对应下标
+          // 减去s2是因为是从s2开始
+          // i + 1是因为i有可能为0（0的话会认为在老节点中不存在）
+
+          // old: { e:4, d:3, c:2, h:0 }
+          // new: { e:2, d:3, c:4, h:5 }
+          // newIndexToOldIndexMap: [0,0,0,0] -> [5,4,3,0]
+          newIndexToOldIndexMap[newIndex - s2] = i + 1
+
+          if (newIndex > maxNewIndexSoFar) {
+            maxNewIndexSoFar = newIndex
+          } else {
+            moved = true
+          }
+
+          patch(prevChild, c2[newIndex], container)
+          patched++
+        }
+      }
+
+      console.log(maxNewIndexSoFar, moved)
+
+      // console.log(`toBePatched:${toBePatched}`)
+    }
+
+    // console.log(`i:${i}-----e1:${e1}-----e2:${e2}`)
   }
 
   function mountChildren(children, container) {
