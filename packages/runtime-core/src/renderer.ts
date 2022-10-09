@@ -12,7 +12,7 @@ export const createRenderer = renderOptions => {
   } = renderOptions
 
   const render = (vnode, container) => {
-    console.log('调用 patch')
+    // console.log('调用 patch')
     if (vnode == null) {
       // 卸载节点
       if (container._vnode) {
@@ -30,7 +30,7 @@ export const createRenderer = renderOptions => {
     }
     // 如果vnode不是同一类型，卸载老节点
     if (n1 && !isSameVNodeType(n1, n2)) {
-      console.log('!isSameVNodeType')
+      // console.log('!isSameVNodeType')
       // unmount()
       n1 = null
     }
@@ -251,7 +251,7 @@ export const createRenderer = renderOptions => {
           keyToNewIndexMap.set(c2[i].key, i)
         }
       }
-      console.log('keyToNewIndexMap', keyToNewIndexMap)
+      console.log('新序列节点对应的下标', keyToNewIndexMap)
 
       // 已经patch的节点个数
       let patched = 0
@@ -299,12 +299,13 @@ export const createRenderer = renderOptions => {
 
           // old: { e:4, d:3, c:2, h:0 }
           // new: { e:2, d:3, c:4, h:5 }
-          // newIndexToOldIndexMap: [0,0,0,0] -> [5,4,3,0]
+          // newIndexToOldIndexMap: [e:0,d:0,:c:0,;h:0] -> [5,4,3,0]
           newIndexToOldIndexMap[newIndex - s2] = i + 1
 
           if (newIndex > maxNewIndexSoFar) {
             maxNewIndexSoFar = newIndex
           } else {
+            // 不是升序的，需要移动
             moved = true
           }
 
@@ -313,12 +314,91 @@ export const createRenderer = renderOptions => {
         }
       }
 
-      console.log(maxNewIndexSoFar, moved)
+      // 移动和创建新节点
+      // 核心算法：利用最长递增子序列优化移动逻辑
+      // 如果序列是升序的话，不需要移动，通过moved进行判断
+      // getSequence返回的是最长子序列对应的下标
+      // increasingNewIndexSequence = [5,4,3,0] -> [3] -> [2]
+      // 3是[5,4,3,0]的最长递增子序列，对应的下标就是2
+      const increasingNewIndexSequence = moved
+        ? getSequence(newIndexToOldIndexMap)
+        : []
+      // 0
+      let j = increasingNewIndexSequence.length - 1
 
-      // console.log(`toBePatched:${toBePatched}`)
+      console.log('新序列节点在旧序列的对应下标+1', newIndexToOldIndexMap)
+      console.log(
+        '最长子序列对应',
+        increasingNewIndexSequence,
+        increasingNewIndexSequence.map(
+          index => [...keyToNewIndexMap.keys()][index]
+        )
+      )
+
+      // 从后往前遍历新节点，方便找出插入元素的anchor
+      for (let i = toBePatched - 1; i >= 0; i--) {
+        const nextIndex = s2 + i
+        const nextChild = c2[nextIndex]
+        // 下一个节点作为anchor
+        const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : null
+        // 旧序列不存在当前节点，需要创建  h
+        if (newIndexToOldIndexMap[i] === 0) {
+          patch(null, nextChild, container, anchor)
+        } else if (moved) {
+          // 需要移动
+          // 如果没有最长子序列 或 最长子序列的值和当前匹配不上
+          if (j < 0 || increasingNewIndexSequence[j] !== i) {
+            console.log(`在${c2[nextIndex + 1].key}前插入${nextChild.key}`)
+            // 移动节点，insertBefore传入已有元素，有移动功能
+            hostInsert(nextChild.el, container, anchor)
+          } else {
+            j--
+          }
+        }
+      }
     }
+  }
 
-    // console.log(`i:${i}-----e1:${e1}-----e2:${e2}`)
+  // 取一个最大递增子序列, 用于记录相对位置没有发生变化的子节点的下标
+  function getSequence(arr: number[]): number[] {
+    const p = arr.slice()
+    const result = [0]
+    let i, j, u, v, c
+    const len = arr.length
+    for (i = 0; i < len; i++) {
+      const arrI = arr[i]
+      if (arrI !== 0) {
+        j = result[result.length - 1]
+        if (arr[j] < arrI) {
+          p[i] = j
+          result.push(i)
+          continue
+        }
+        u = 0
+        v = result.length - 1
+        while (u < v) {
+          c = (u + v) >> 1
+          if (arr[result[c]] < arrI) {
+            u = c + 1
+          } else {
+            v = c
+          }
+        }
+        if (arrI < arr[result[u]]) {
+          if (u > 0) {
+            p[i] = result[u - 1]
+          }
+          result[u] = i
+        }
+      }
+    }
+    u = result.length
+    v = result[u - 1]
+    while (u-- > 0) {
+      result[u] = v
+      v = p[v]
+    }
+    return result
   }
 
   function mountChildren(children, container) {

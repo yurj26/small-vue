@@ -22,15 +22,18 @@
             'div',
             { key: 'B', class: 'old' },
             [
-              h('li', { key: 'a' }, 'a'),
-              h('li', { key: 'b' }, 'b'),
+              h('li', { key: 'a', class: 'normal' }, 'a'),
+              h('li', { key: 'b', class: 'normal' }, 'b'),
 
+              h('li', { key: 'n' }, 'n'),
               h('li', { key: 'c' }, 'c'),
               h('li', { key: 'd' }, 'd'),
               h('li', { key: 'e' }, 'e'),
+              h('li', { key: 'm' }, 'm'),
 
-              h('li', { key: 'f' }, 'f'),
-              h('li', { key: 'g' }, 'g'),
+
+              h('li', { key: 'f', class: 'normal' }, 'f'),
+              h('li', { key: 'g', class: 'normal' }, 'g'),
             ]
           )
           , app
@@ -44,15 +47,17 @@
             'div',
             { key: 'A', class: 'old' },
             [
-              h('li', { key: 'a' }, 'a'),
-              h('li', { key: 'b' }, 'b'),
+              h('li', { key: 'a', class: 'normal' }, 'a'),
+              h('li', { key: 'b', class: 'normal' }, 'b'),
 
+              h('li', { key: 'n' }, 'n'),
               h('li', { key: 'c' }, 'c'),
               h('li', { key: 'd' }, 'd'),
               h('li', { key: 'e' }, 'e'),
+              h('li', { key: 'm' }, 'm'),
 
-              h('li', { key: 'f' }, 'f'),
-              h('li', { key: 'g' }, 'g'),
+              h('li', { key: 'f', class: 'normal' }, 'f'),
+              h('li', { key: 'g', class: 'normal' }, 'g'),
             ]
           )
           , app
@@ -65,16 +70,17 @@
               'div',
               { key: 'A', class: 'new' },
               [
-                h('li', { key: 'a' }, 'a'),
-                h('li', { key: 'b' }, 'b'),
+                h('li', { key: 'a', class: 'normal' }, 'a'),
+                h('li', { key: 'b', class: 'normal' }, 'b'),
 
-                h('li', { key: 'e' }, 'e'),
-                h('li', { key: 'd' }, 'd'),
                 h('li', { key: 'c' }, 'c'),
-                h('li', { key: 'h' }, 'h'),
+                h('li', { key: 'd' }, 'd'),
+                h('li', { key: 'm' }, 'm'),
+                h('li', { key: 'e' }, 'e'),
+                h('li', { key: 'n' }, 'n'),
 
-                h('li', { key: 'f' }, 'f'),
-                h('li', { key: 'g' }, 'g'),
+                h('li', { key: 'f', class: 'normal' }, 'f'),
+                h('li', { key: 'g', class: 'normal' }, 'g'),
               ]
             )
             , app
@@ -87,9 +93,12 @@
         display: flex;
       }
 
+      .normal{
+        background: yellowgreen;
+      }
+
       li {
         list-style: none;
-        display: inline-block;
         margin: 10px;
         width: 50px;
         height: 50px;
