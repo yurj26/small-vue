@@ -1,5 +1,5 @@
 import { ShapeFlags } from '@small-vue/shared'
-import { isSameVNodeType, Text } from './vnode'
+import { isSameVNodeType, Text, Fragment } from './vnode'
 import { createAppAPI } from './apiCreateApp'
 export const createRenderer = renderOptions => {
   const {
@@ -39,6 +39,9 @@ export const createRenderer = renderOptions => {
     switch (type) {
       case Text:
         processText(n1, n2, container)
+        break
+      case Fragment:
+        processFragment(n1, n2, container)
         break
       default:
         if (shapeFlag & ShapeFlags.ELEMENT) {
@@ -433,6 +436,14 @@ export const createRenderer = renderOptions => {
     } else {
       // 更新节点
       patchElement(n1, n2, container, anchor)
+    }
+  }
+
+  function processFragment(n1, n2, container) {
+    if (n1 == null) {
+      mountChildren(n2.children, container)
+    } else {
+      patchChildren(n1, n2, container, null)
     }
   }
 
