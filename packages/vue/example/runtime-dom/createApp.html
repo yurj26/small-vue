@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      123
+      <!-- <div id="prev"></div>
+      <div id="next"></div> -->
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script type="module">
+      import { createApp, h, render } from '../../dist/small-vue.esm-bundler.js'
+      // const {createApp,h} = Vue
+      
+      // const prev = document.getElementById('prev')
+      // const next = document.getElementById('next')
+      const app = document.getElementById('app')
+      
+      const cApp = createApp({
+        template: '<div>123</div>'
+      }).mount(app)
+
+    </script>
+    <style>
+      .old, .new {
+        display: flex;
+      }
+
+      .normal{
+        background: yellowgreen;
+      }
+
+      li {
+        list-style: none;
+        margin: 10px;
+        width: 50px;
+        height: 50px;
+        background: green;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+      }
+    </style>
+</html>
