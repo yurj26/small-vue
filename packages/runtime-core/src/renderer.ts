@@ -12,11 +12,10 @@ export const createRenderer = renderOptions => {
   } = renderOptions
 
   const render = (vnode, container) => {
-    // console.log('调用 patch')
     if (vnode == null) {
       // 卸载节点
       if (container._vnode) {
-        // unmount()
+        unmount(container._vnode)
       }
     } else {
       patch(container._vnode || null, vnode, container)
@@ -30,8 +29,7 @@ export const createRenderer = renderOptions => {
     }
     // 如果vnode不是同一类型，卸载老节点
     if (n1 && !isSameVNodeType(n1, n2)) {
-      // console.log('!isSameVNodeType')
-      // unmount()
+      unmount(n1)
       n1 = null
     }
     // 渲染核心逻辑
@@ -70,10 +68,17 @@ export const createRenderer = renderOptions => {
     hostInsert(el, container, anchor)
   }
 
-  function patchElement(n1, n2, container, anchor) {
-    // console.log('oldVNode', n1)
-    // console.log('newVNode', n2)
+  function unmount(vnode) {
+    hostRemove(vnode.el)
+  }
 
+  function unmountChildren(children) {
+    for (let i = 0; i < children.length; i++) {
+      unmount(children[i])
+    }
+  }
+
+  function patchElement(n1, n2, container, anchor) {
     const oldProps = n1?.props || {}
     const newProps = n2?.props || {}
 
@@ -131,7 +136,7 @@ export const createRenderer = renderOptions => {
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
       // prev children: array
       if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-        // unmountChildren()
+        unmountChildren(c1)
         console.log('array -> text')
       }
       if (c1 !== c2) {
@@ -148,7 +153,7 @@ export const createRenderer = renderOptions => {
         } else {
           // array -> null
           console.log('array -> null')
-          // unmountChildren()
+          unmountChildren(c1)
         }
       } else {
         //prev children: text
@@ -231,7 +236,7 @@ export const createRenderer = renderOptions => {
     // i = 0, e1 = 0, e2 = -1
     else if (i > e2 && i <= e1) {
       while (i <= e1) {
-        hostRemove(c1[i].el)
+        unmount(c1[i])
         i++
       }
     }
@@ -270,7 +275,7 @@ export const createRenderer = renderOptions => {
         const prevChild = c1[i]
         // 所有新节点已经被patch，移除旧的
         if (patched >= toBePatched) {
-          hostRemove(prevChild.el)
+          unmount(prevChild)
           continue
         }
         // 在新序列中该旧节点对应的下标
@@ -291,7 +296,7 @@ export const createRenderer = renderOptions => {
         }
         // 如果在新序列中没有找到下标，删除该节点
         if (newIndex === undefined) {
-          hostRemove(prevChild.el)
+          unmount(prevChild)
         } else {
           // 新序列节点在旧序列节点的对应下标
           // 减去s2是因为是从s2开始
@@ -328,7 +333,7 @@ export const createRenderer = renderOptions => {
 
       console.log('新序列节点在旧序列的对应下标+1', newIndexToOldIndexMap)
       console.log(
-        '最长子序列对应',
+        '最长子序列',
         increasingNewIndexSequence,
         increasingNewIndexSequence.map(
           index => [...keyToNewIndexMap.keys()][index]
