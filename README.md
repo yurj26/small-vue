@@ -28,6 +28,7 @@
 
 - [x] 支持 element 类型
 - [x] 支持 Text 类型节点
+- [x] 支持 Fragment 类型节点
 - [x] h 函数
 - [x] createVNode
 - [x] element patch
