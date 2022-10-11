@@ -1,6 +1,7 @@
 import { ShapeFlags } from '@small-vue/shared'
 import { isSameVNodeType, Text, Fragment } from './vnode'
 import { createAppAPI } from './apiCreateApp'
+import { createComponentInstance, setupComponent } from './component'
 export const createRenderer = renderOptions => {
   const {
     createElement: hostCreateElement,
@@ -24,7 +25,13 @@ export const createRenderer = renderOptions => {
     container._vnode = vnode
   }
 
-  function patch(n1, n2, container = null, anchor = null) {
+  function patch(
+    n1,
+    n2,
+    container = null,
+    anchor = null,
+    parentComponent = null
+  ) {
     if (n1 === n2) {
       return
     }
@@ -46,6 +53,8 @@ export const createRenderer = renderOptions => {
       default:
         if (shapeFlag & ShapeFlags.ELEMENT) {
           processElement(n1, n2, container, anchor)
+        } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+          processComponent(n1, n2, container, anchor, parentComponent)
         }
     }
   }
@@ -445,6 +454,26 @@ export const createRenderer = renderOptions => {
     } else {
       patchChildren(n1, n2, container, null)
     }
+  }
+
+  function processComponent(n1, n2, container, anchor, parentComponent) {
+    if (n1 == null) {
+      // 创建组件
+      mountComponent(n2, container, anchor, parentComponent)
+    }
+  }
+
+  function mountComponent(initialVNode, container, anchor, parentComponent) {
+    const instance = (initialVNode = createComponentInstance(
+      initialVNode,
+      parentComponent
+    ))
+
+    setupComponent(instance)
+
+    console.log(`创建组件实例:${instance.type.name}`)
+
+    console.log(instance)
   }
 
   return {

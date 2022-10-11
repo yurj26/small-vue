@@ -14,7 +14,9 @@ export const Text = Symbol('Text')
 export const Fragment = Symbol('Fragment')
 
 export function createVNode(type, props?: any, children?: any) {
-  const shapeFlag = isString(type) ? ShapeFlags.ELEMENT : 0
+  const shapeFlag = isString(type)
+    ? ShapeFlags.ELEMENT
+    : ShapeFlags.STATEFUL_COMPONENT
 
   const vnode = {
     __v_isVNode: true,
