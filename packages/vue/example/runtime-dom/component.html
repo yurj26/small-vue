@@ -8,31 +8,35 @@
   <body>
     <div id="app">
     </div>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
     <script type="module">
-      // import {  h, render} from '../../dist/small-vue.esm-bundler.js'
-      const { h, render, Fragment  } = Vue
+      import {  h, render } from '../../dist/small-vue.esm-bundler.js'
+      // const { h, render, Fragment  } = Vue
       const app = document.getElementById('app')
 
       const VueComponent = {
         name: 'componentName',
         data() {
           return {
-            a: 1
+            name: 'yrj',
+            num: 1
           }
         },
         render() {
-          return h('h1', '123')
+          setTimeout(() =>{
+            this.name = 'yrj1'
+            this.num+=1
+          }, 1000);
+          return h('h1', this.name + this.num + this.age)
         },
         props: {
-          prop: {
-            default: 0,
+          age: {
+            default: 18,
             type: Number
           } 
         }
       }
-      render(h(VueComponent,123), app)
-      console.log(h(VueComponent, 123))
+      render(h(VueComponent, {age: 22, num:123 }), app)
       // setTimeout(function() {
       //   render(h(Fragment,[h('h1', 222), h('h2', 222)]), app)
       // }, 1000);

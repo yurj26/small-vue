@@ -1,6 +1,6 @@
 export * from './shapeFlags'
 
-export const isObject = (val) => {
+export const isObject = val => {
   return val !== null && typeof val === 'object'
 }
 
@@ -32,6 +32,9 @@ export const extend = Object.assign
 export function hasChanged(value, oldValue) {
   return !Object.is(value, oldValue)
 }
+
+const hasOwnProperty = Object.prototype.hasOwnProperty
+export const hasOwn = (val, key) => hasOwnProperty.call(val, key)
 
 const onRE = /^on[^a-z]/
 export const isOn = (key: string) => onRE.test(key)

@@ -2,6 +2,8 @@ import { ShapeFlags } from '@small-vue/shared'
 import { isSameVNodeType, Text, Fragment } from './vnode'
 import { createAppAPI } from './apiCreateApp'
 import { createComponentInstance, setupComponent } from './component'
+import { ReactiveEffect } from '@small-vue/reactivity'
+import { queueJob } from './scheduler'
 export const createRenderer = renderOptions => {
   const {
     createElement: hostCreateElement,
@@ -463,17 +465,38 @@ export const createRenderer = renderOptions => {
     }
   }
 
-  function mountComponent(initialVNode, container, anchor, parentComponent) {
-    const instance = (initialVNode = createComponentInstance(
-      initialVNode,
+  function mountComponent(vnode, container, anchor, parentComponent) {
+    const instance = (vnode.component = createComponentInstance(
+      vnode,
       parentComponent
     ))
 
     setupComponent(instance)
 
-    console.log(`创建组件实例:${instance.type.name}`)
+    setupRenderEffect(instance, container, anchor)
+  }
 
-    console.log(instance)
+  function setupRenderEffect(instance, container, anchor) {
+    const { render } = instance
+    function componentUpdateFn() {
+      if (!instance.isMounted) {
+        const subTree = render.call(instance.proxy)
+        patch(null, subTree, container, anchor)
+        instance.subTree = subTree
+        instance.isMounted = true
+      } else {
+        const subTree = render.call(instance.proxy)
+        patch(instance.subTree, subTree, container, anchor)
+        instance.subTree = subTree
+        instance.isMounted = false
+      }
+    }
+
+    const effect = new ReactiveEffect(componentUpdateFn, () =>
+      queueJob(instance.update)
+    )
+    let update = (instance.update = effect.run.bind(effect))
+    update()
   }
 
   return {

@@ -3,8 +3,8 @@ export {
   readonly,
   shallowReactive,
   shallowReadonly,
-  toRaw,
+  toRaw
 } from './reactive'
-export { effect, stop } from './effect'
+export { effect, stop, ReactiveEffect } from './effect'
 export { ref } from './ref'
 export { computed } from './computed'
