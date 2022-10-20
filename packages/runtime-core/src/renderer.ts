@@ -4,6 +4,7 @@ import { createAppAPI } from './apiCreateApp'
 import { createComponentInstance, setupComponent } from './component'
 import { ReactiveEffect } from '@small-vue/reactivity'
 import { queueJob } from './scheduler'
+import { updateProps } from './componentProps'
 export const createRenderer = renderOptions => {
   const {
     createElement: hostCreateElement,
@@ -462,6 +463,9 @@ export const createRenderer = renderOptions => {
     if (n1 == null) {
       // 创建组件
       mountComponent(n2, container, anchor, parentComponent)
+    } else {
+      // 更新组件  更新props
+      updateComponent(n1, n2)
     }
   }
 
@@ -497,6 +501,16 @@ export const createRenderer = renderOptions => {
     )
     let update = (instance.update = effect.run.bind(effect))
     update()
+  }
+
+  function updateComponent(n1, n2) {
+    // 复用instance实例
+    const instance = (n2.component = n1.component)
+
+    const { props: prevProps } = n1
+    const { props: nextProps } = n2
+
+    updateProps(instance, prevProps, nextProps)
   }
 
   return {
