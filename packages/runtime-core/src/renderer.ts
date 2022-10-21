@@ -4,7 +4,7 @@ import { createAppAPI } from './apiCreateApp'
 import { createComponentInstance, setupComponent } from './component'
 import { ReactiveEffect } from '@small-vue/reactivity'
 import { queueJob } from './scheduler'
-import { updateProps } from './componentProps'
+import { hasPropsChanged, updateProps } from './componentProps'
 export const createRenderer = renderOptions => {
   const {
     createElement: hostCreateElement,
@@ -470,14 +470,21 @@ export const createRenderer = renderOptions => {
   }
 
   function mountComponent(vnode, container, anchor, parentComponent) {
+    // 创建组件实例
     const instance = (vnode.component = createComponentInstance(
       vnode,
       parentComponent
     ))
-
+    // 实例赋值
     setupComponent(instance)
-
+    // effect 渲染组件
     setupRenderEffect(instance, container, anchor)
+  }
+  // 组件更新前的操作
+  function updateComponentPreRender(instance, nextVNode) {
+    instance.next = null
+    instance.vnode = nextVNode
+    updateProps(instance.props, nextVNode.props)
   }
 
   function setupRenderEffect(instance, container, anchor) {
@@ -489,6 +496,10 @@ export const createRenderer = renderOptions => {
         instance.subTree = subTree
         instance.isMounted = true
       } else {
+        const { next } = instance
+        if (next) {
+          updateComponentPreRender(instance, next)
+        }
         const subTree = render.call(instance.proxy)
         patch(instance.subTree, subTree, container, anchor)
         instance.subTree = subTree
@@ -502,17 +513,28 @@ export const createRenderer = renderOptions => {
     update()
   }
 
-  // function shouldUpdate
+  function shouldUpdateComponent(n1, n2) {
+    const { props: prevProps, children: prevChildren } = n1
+    const { props: nextProps, children: nextChildren } = n2
+
+    if (prevProps === nextProps) {
+      return false
+    }
+    // 插槽需要更新
+    if (prevChildren || nextChildren) {
+      return true
+    }
+    return hasPropsChanged(prevProps, nextProps)
+  }
 
   function updateComponent(n1, n2) {
     // 复用instance实例
     const instance = (n2.component = n1.component)
-
-    const { props: prevProps } = n1
-    const { props: nextProps } = n2
-
-    updateProps(instance, prevProps, nextProps)
-    // instance.update()
+    // 需要更新了才进行更新
+    if (shouldUpdateComponent(n1, n2)) {
+      instance.next = n2
+      instance.update()
+    }
   }
 
   return {

@@ -21,7 +21,7 @@ export function initProps(instance, rawProps) {
   instance.attrs = attrs
 }
 
-const hasPropsChanged = (prevProps, nextProps) => {
+export const hasPropsChanged = (prevProps, nextProps) => {
   const nextKeys = Object.keys(nextProps)
   // 比对个数
   if (nextKeys.length !== Object.keys(prevProps).length) {
@@ -37,16 +37,14 @@ const hasPropsChanged = (prevProps, nextProps) => {
   return false
 }
 
-export function updateProps(instance, prevProps, nextProps) {
-  if (hasPropsChanged(prevProps, nextProps)) {
-    for (let key in nextProps) {
-      instance.props[key] = nextProps[key]
-    }
+export function updateProps(prevProps, nextProps) {
+  for (let key in nextProps) {
+    prevProps[key] = nextProps[key]
+  }
 
-    for (let key in prevProps) {
-      if (!hasOwn(instance.props, key)) {
-        delete instance.props[key]
-      }
+  for (let key in prevProps) {
+    if (!hasOwn(prevProps, key)) {
+      delete prevProps[key]
     }
   }
 }
