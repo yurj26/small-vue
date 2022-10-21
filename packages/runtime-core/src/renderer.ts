@@ -39,6 +39,7 @@ export const createRenderer = renderOptions => {
       return
     }
     // 如果vnode不是同一类型，卸载老节点
+    console.log('isSame', n1 && isSameVNodeType(n1, n2), n1, n2)
     if (n1 && !isSameVNodeType(n1, n2)) {
       unmount(n1)
       n1 = null
@@ -492,7 +493,6 @@ export const createRenderer = renderOptions => {
         const subTree = render.call(instance.proxy)
         patch(instance.subTree, subTree, container, anchor)
         instance.subTree = subTree
-        instance.isMounted = false
       }
     }
 
@@ -503,6 +503,8 @@ export const createRenderer = renderOptions => {
     update()
   }
 
+  // function shouldUpdate
+
   function updateComponent(n1, n2) {
     // 复用instance实例
     const instance = (n2.component = n1.component)
@@ -511,6 +513,7 @@ export const createRenderer = renderOptions => {
     const { props: nextProps } = n2
 
     updateProps(instance, prevProps, nextProps)
+    // instance.update()
   }
 
   return {
