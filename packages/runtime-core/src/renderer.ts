@@ -39,7 +39,6 @@ export const createRenderer = renderOptions => {
       return
     }
     // 如果vnode不是同一类型，卸载老节点
-    console.log('isSame', n1 && isSameVNodeType(n1, n2), n1, n2)
     if (n1 && !isSameVNodeType(n1, n2)) {
       unmount(n1)
       n1 = null

@@ -38,11 +38,9 @@ const hasPropsChanged = (prevProps, nextProps) => {
 }
 
 export function updateProps(instance, prevProps, nextProps) {
-  console.log(hasPropsChanged(prevProps, nextProps))
   if (hasPropsChanged(prevProps, nextProps)) {
     for (let key in nextProps) {
       instance.props[key] = nextProps[key]
-      console.log('instance', instance)
     }
 
     for (let key in prevProps) {
