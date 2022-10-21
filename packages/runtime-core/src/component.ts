@@ -1,4 +1,4 @@
-import { reactive } from '@small-vue/reactivity'
+import { proxyRefs, reactive } from '@small-vue/reactivity'
 import { hasOwn, isFunction } from '@small-vue/shared'
 import { initProps } from './componentProps'
 
@@ -31,9 +31,11 @@ const publicPropertyMap = {
 
 const PublicInstanceProxyHandlers = {
   get(target, key) {
-    const { data, props } = target
+    const { data, props, setupState } = target
     if (data && hasOwn(data, key)) {
       return data[key]
+    } else if (setupState && hasOwn(setupState, key)) {
+      return setupState[key]
     } else if (props && hasOwn(props, key)) {
       return props[key]
     }
@@ -42,9 +44,12 @@ const PublicInstanceProxyHandlers = {
     return getter(target)
   },
   set(target, key, value) {
-    const { data, props } = target
+    const { data, props, setupState } = target
     if (data && hasOwn(data, key)) {
       data[key] = value
+      return true
+    } else if (setupState && hasOwn(setupState, key)) {
+      setupState[key] = value
       return true
     } else if (props && hasOwn(props, key)) {
       // props不允许修改
@@ -57,13 +62,27 @@ const PublicInstanceProxyHandlers = {
 
 export function setupComponent(instance) {
   // 处理props
-  const { props, type } = instance.vnode
+  const { props, type: Component } = instance.vnode
 
   initProps(instance, props)
 
   instance.proxy = new Proxy(instance, PublicInstanceProxyHandlers)
 
-  let data = type.data
+  const { setup } = Component
+
+  if (setup) {
+    const setupContext = {}
+    const setupResult = setup(instance.props, setupContext)
+    if (isFunction(setupResult)) {
+      // 返回值是渲染函数
+      instance.render = setupResult
+    } else {
+      // 解构ref
+      instance.setupState = proxyRefs(setupResult)
+    }
+  }
+
+  const { data } = Component
   if (data) {
     if (!isFunction(data)) {
       // vue3中，dat必须为函数
@@ -72,5 +91,7 @@ export function setupComponent(instance) {
     instance.data = reactive(data.call(instance.proxy))
   }
 
-  instance.render = type.render
+  if (!instance.render) {
+    instance.render = Component.render
+  }
 }

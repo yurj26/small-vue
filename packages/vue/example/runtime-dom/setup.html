@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+    </div>
+    <script type="module">
+      import { Text, h, render, ref } from '../../dist/small-vue.esm-bundler.js'
+      const app = document.getElementById('app')
+
+
+      const VueComponent = {
+        data(){
+          return {
+            flag: false
+          }
+        },
+        render() {
+          return h('div', this.a)
+        },
+        setup() {
+          return () => h('div', '123')
+        }
+      }
+      render(h(VueComponent),app)
+    </script>
+</html>
