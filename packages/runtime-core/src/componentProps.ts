@@ -10,7 +10,7 @@ export function initProps(instance, rawProps) {
   if (rawProps) {
     for (let key in rawProps) {
       let value = rawProps[key]
-      if (key in propsOptions) {
+      if (key in propsOptions || key.startsWith('on')) {
         props[key] = value
       } else {
         attrs[key] = value

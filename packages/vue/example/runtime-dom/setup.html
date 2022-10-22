@@ -22,10 +22,10 @@
         render() {
           return h('div', this.a)
         },
-        setup() {
-          return () => h('div', '123')
+        setup(props, { emit }) {
+          return () => h('div', {onClick: () => emit('xxx', 'ok')}, 123)
         }
       }
-      render(h(VueComponent),app)
+      render(h(VueComponent, {onXxx: (e) =>console.log('11', e)}),app)
     </script>
 </html>

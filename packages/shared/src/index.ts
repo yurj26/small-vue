@@ -38,3 +38,32 @@ export const hasOwn = (val, key) => hasOwnProperty.call(val, key)
 
 const onRE = /^on[^a-z]/
 export const isOn = (key: string) => onRE.test(key)
+
+const camelizeRE = /-(\w)/g
+/**
+ * @private
+ * change-xxx -> changeXxx
+ */
+export const camelize = (str: string): string => {
+  return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''))
+}
+
+const hyphenateRE = /\B([A-Z])/g
+/**
+ * @private
+ */
+export const hyphenate = (str: string) =>
+  str.replace(hyphenateRE, '-$1').toLowerCase()
+
+/**
+ * @private
+ * 首字母大写
+ */
+export const capitalize = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1)
+
+/**
+ * @private
+ * 添加 on 前缀，并且首字母大写
+ */
+export const toHandlerKey = (str: string) => (str ? `on${capitalize(str)}` : ``)

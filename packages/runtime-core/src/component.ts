@@ -1,6 +1,7 @@
 import { proxyRefs, reactive } from '@small-vue/reactivity'
 import { hasOwn, isFunction } from '@small-vue/shared'
 import { initProps } from './componentProps'
+import { emit } from './componentEmits'
 
 export function createComponentInstance(vnode, parent) {
   const instance = {
@@ -8,7 +9,7 @@ export function createComponentInstance(vnode, parent) {
     type: vnode.type,
     vnode,
     next: null, // 需要更新的 vnode，用于更新 component 类型的组件
-    propsOptions: vnode.type.props,
+    propsOptions: vnode.type.props || {},
     props: {},
     attrs: {}, // 存放 attrs 的数据
     parent,
@@ -21,6 +22,8 @@ export function createComponentInstance(vnode, parent) {
     setupState: {}, // 存储 setup 的返回值
     emit: () => {}
   }
+
+  instance.emit = emit.bind(null, instance) as any
 
   return instance
 }
@@ -65,14 +68,14 @@ export function setupComponent(instance) {
   const { props, type: Component } = instance.vnode
 
   initProps(instance, props)
-
+  // 创建渲染上下文对象，porxy
   instance.proxy = new Proxy(instance, PublicInstanceProxyHandlers)
 
   const { setup } = Component
 
   if (setup) {
-    const setupContext = {}
-    const setupResult = setup(instance.props, setupContext)
+    const setupContext = createSetupContext(instance)
+    const setupResult = setup && setup(instance.props, setupContext)
     if (isFunction(setupResult)) {
       // 返回值是渲染函数
       instance.render = setupResult
@@ -93,5 +96,14 @@ export function setupComponent(instance) {
 
   if (!instance.render) {
     instance.render = Component.render
+  }
+}
+
+function createSetupContext(instance) {
+  return {
+    attrs: instance.attrs,
+    slots: instance.slots,
+    emit: instance.emit,
+    expose: () => {}
   }
 }
