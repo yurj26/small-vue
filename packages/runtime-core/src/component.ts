@@ -1,8 +1,9 @@
 import { proxyRefs, reactive } from '@small-vue/reactivity'
-import { hasOwn, isFunction } from '@small-vue/shared'
+import { isFunction } from '@small-vue/shared'
 import { initProps } from './componentProps'
 import { emit } from './componentEmits'
 import { initSlots } from './componentSlots'
+import { PublicInstanceProxyHandlers } from './componentPublicInstance'
 
 export function createComponentInstance(vnode, parent) {
   const instance = {
@@ -27,42 +28,6 @@ export function createComponentInstance(vnode, parent) {
   instance.emit = emit.bind(null, instance) as any
 
   return instance
-}
-
-const publicPropertyMap = {
-  $attrs: i => i.attrs,
-  $slots: i => i.slots
-}
-
-const PublicInstanceProxyHandlers = {
-  get(target, key) {
-    const { data, props, setupState } = target
-    if (data && hasOwn(data, key)) {
-      return data[key]
-    } else if (setupState && hasOwn(setupState, key)) {
-      return setupState[key]
-    } else if (props && hasOwn(props, key)) {
-      return props[key]
-    }
-    // this.$attrs this.$slots
-    const getter = publicPropertyMap[key]
-    return getter(target)
-  },
-  set(target, key, value) {
-    const { data, props, setupState } = target
-    if (data && hasOwn(data, key)) {
-      data[key] = value
-      return true
-    } else if (setupState && hasOwn(setupState, key)) {
-      setupState[key] = value
-      return true
-    } else if (props && hasOwn(props, key)) {
-      // props不允许修改
-      console.warn('attempting to mutate prop ' + String(key))
-      return false
-    }
-    return true
-  }
 }
 
 export function setupComponent(instance) {
