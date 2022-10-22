@@ -2,6 +2,7 @@ import { proxyRefs, reactive } from '@small-vue/reactivity'
 import { hasOwn, isFunction } from '@small-vue/shared'
 import { initProps } from './componentProps'
 import { emit } from './componentEmits'
+import { initSlots } from './componentSlots'
 
 export function createComponentInstance(vnode, parent) {
   const instance = {
@@ -29,7 +30,8 @@ export function createComponentInstance(vnode, parent) {
 }
 
 const publicPropertyMap = {
-  $attrs: i => i.attrs
+  $attrs: i => i.attrs,
+  $slots: i => i.slots
 }
 
 const PublicInstanceProxyHandlers = {
@@ -42,7 +44,7 @@ const PublicInstanceProxyHandlers = {
     } else if (props && hasOwn(props, key)) {
       return props[key]
     }
-    // this.$attrs
+    // this.$attrs this.$slots
     const getter = publicPropertyMap[key]
     return getter(target)
   },
@@ -64,10 +66,11 @@ const PublicInstanceProxyHandlers = {
 }
 
 export function setupComponent(instance) {
+  const { props, type: Component, children } = instance.vnode
   // 处理props
-  const { props, type: Component } = instance.vnode
-
   initProps(instance, props)
+  // 处理插槽
+  initSlots(instance, children)
   // 创建渲染上下文对象，porxy
   instance.proxy = new Proxy(instance, PublicInstanceProxyHandlers)
 

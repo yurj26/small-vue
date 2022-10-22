@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+    </div>
+    <script type="module">
+      import { Text, h, render, ref } from '../../dist/small-vue.esm-bundler.js'
+      const app = document.getElementById('app')
+
+      const VueComponent = {
+        data(){
+          return {
+            flag: false
+          }
+        },
+        render() {
+          return h('div', [
+            this.$slots.header,
+            this.$slots.content
+          ])
+        },
+        setup(props, { emit, slots }) {
+          return () => h('div', [
+            slots.header,
+            slots.content
+          ])
+        }
+      }
+      const slots = {
+        header: h('h1', 'header'),
+        content: h('h1', 'content'),
+      }
+      // 第三个参数为对象就是插槽
+      render(h(VueComponent, null, slots),app)
+    </script>
+</html>

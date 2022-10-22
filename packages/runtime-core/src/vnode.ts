@@ -1,4 +1,4 @@
-import { isString, isArray, ShapeFlags } from '@small-vue/shared'
+import { isString, isArray, ShapeFlags, isObject } from '@small-vue/shared'
 
 export function isVNode(value) {
   return value?.__v_isVNode
@@ -32,6 +32,8 @@ export function createVNode(type, props?: any, children?: any) {
     let type = 0
     if (isArray(children)) {
       type = ShapeFlags.ARRAY_CHILDREN
+    } else if (isObject(children)) {
+      type = ShapeFlags.SLOTS_CHILDREN
     } else {
       children = String(children)
       type = ShapeFlags.TEXT_CHILDREN
