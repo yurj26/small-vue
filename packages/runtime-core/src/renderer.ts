@@ -4,7 +4,8 @@ import { createAppAPI } from './apiCreateApp'
 import { createComponentInstance, setupComponent } from './component'
 import { ReactiveEffect } from '@small-vue/reactivity'
 import { queueJob } from './scheduler'
-import { hasPropsChanged, updateProps } from './componentProps'
+import { updateProps } from './componentProps'
+import { shouldUpdateComponent } from './componentRenderUtils'
 export const createRenderer = renderOptions => {
   const {
     createElement: hostCreateElement,
@@ -511,20 +512,6 @@ export const createRenderer = renderOptions => {
     )
     let update = (instance.update = effect.run.bind(effect))
     update()
-  }
-
-  function shouldUpdateComponent(n1, n2) {
-    const { props: prevProps, children: prevChildren } = n1
-    const { props: nextProps, children: nextChildren } = n2
-
-    if (prevProps === nextProps) {
-      return false
-    }
-    // 插槽需要更新
-    if (prevChildren || nextChildren) {
-      return true
-    }
-    return hasPropsChanged(prevProps, nextProps)
   }
 
   function updateComponent(n1, n2) {

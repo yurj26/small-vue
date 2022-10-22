@@ -21,22 +21,6 @@ export function initProps(instance, rawProps) {
   instance.attrs = attrs
 }
 
-export const hasPropsChanged = (prevProps, nextProps) => {
-  const nextKeys = Object.keys(nextProps)
-  // 比对个数
-  if (nextKeys.length !== Object.keys(prevProps).length) {
-    return true
-  }
-  // 比对value
-  for (let i = 0; i < nextKeys.length; i++) {
-    let key = nextKeys[i]
-    if (nextProps[key] !== prevProps[key]) {
-      return true
-    }
-  }
-  return false
-}
-
 export function updateProps(prevProps, nextProps) {
   for (let key in nextProps) {
     prevProps[key] = nextProps[key]
