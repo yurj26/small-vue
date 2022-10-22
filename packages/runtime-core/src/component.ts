@@ -42,8 +42,13 @@ export function setupComponent(instance) {
   const { setup } = Component
 
   if (setup) {
+    setCurrentInstance(instance)
+
     const setupContext = createSetupContext(instance)
     const setupResult = setup && setup(instance.props, setupContext)
+
+    unsetCurrentInstance()
+
     if (isFunction(setupResult)) {
       // 返回值是渲染函数
       instance.render = setupResult
@@ -74,4 +79,18 @@ function createSetupContext(instance) {
     emit: instance.emit,
     expose: () => {}
   }
+}
+
+let currentInstance = null
+
+export function getCurrentInstance() {
+  return currentInstance
+}
+
+export function setCurrentInstance(instance) {
+  currentInstance = instance
+}
+
+export function unsetCurrentInstance() {
+  currentInstance = null
 }
