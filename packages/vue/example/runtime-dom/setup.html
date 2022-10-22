@@ -10,22 +10,20 @@
     </div>
     <script type="module">
       import { Text, h, render, ref } from '../../dist/small-vue.esm-bundler.js'
+
       const app = document.getElementById('app')
 
-
       const VueComponent = {
-        data(){
-          return {
-            flag: false
-          }
-        },
-        render() {
-          return h('div', this.a)
-        },
         setup(props, { emit }) {
-          return () => h('div', {onClick: () => emit('xxx', 'ok')}, 123)
+          emit('change', 'ok1')
+          emit('change-data', 'ok2')
+          emit('changeData', 'ok2')
+          return () => h('div', 123)
         }
       }
-      render(h(VueComponent, {onXxx: (e) =>console.log('11', e)}),app)
+      render(h(VueComponent, {
+        onChange: (e) =>console.log('value:', e),
+        onChangeData: (e) =>console.log('value:', e)
+      }),app)
     </script>
 </html>
