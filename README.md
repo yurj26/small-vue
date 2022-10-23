@@ -45,6 +45,8 @@
 - [x] 支持 emit
 - [x] 支持 provide/inject
 - [x] 支持 getCurrentInstance
+- [x] 支持 slots
+- [x] 支持 setup 函数
 
 #### runtime-dom
 
