@@ -43,7 +43,6 @@ export function setupComponent(instance) {
 
   if (setup) {
     setCurrentInstance(instance)
-
     const setupContext = createSetupContext(instance)
     const setupResult = setup && setup(instance.props, setupContext)
 
@@ -83,7 +82,7 @@ function createSetupContext(instance) {
 
 let currentInstance = null
 
-export function getCurrentInstance() {
+export function getCurrentInstance(): any {
   return currentInstance
 }
 
