@@ -41,6 +41,10 @@
 - [x] createVNode
 - [x] element patch
 - [x] element diff 算法 双端比较
+- [x] 支持 compoonent
+- [x] 支持 emit
+- [x] 支持 provide/inject
+- [x] 支持 getCurrentInstance
 
 #### runtime-dom
 
