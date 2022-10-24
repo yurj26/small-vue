@@ -40,6 +40,12 @@
           onUpdated(() => {
             console.log('onUpdated')
           })
+          onBeforeUnmount(() => {
+            console.log('onBeforeUnmount')
+          })
+          onUnmounted(() => {
+            console.log('onUnmounted')
+          })
 
           const counter = ref('1')
           setTimeout(function() {
@@ -54,5 +60,9 @@
         }
       }
       render(h(VueComponent), app)
+      // 销毁组件 
+      setTimeout(function() {
+        render(h('h1', 'text'), app)
+      }, 1200);
     </script>
 </html>

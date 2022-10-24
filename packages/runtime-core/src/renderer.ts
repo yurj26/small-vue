@@ -86,13 +86,31 @@ export const createRenderer = renderOptions => {
   }
 
   function unmount(vnode) {
-    // todo component的卸载
-    hostRemove(vnode.el)
+    const { shapeFlag } = vnode
+
+    if (shapeFlag & ShapeFlags.COMPONENT) {
+      unmountComponent(vnode.component)
+    } else {
+      hostRemove(vnode.el)
+    }
   }
 
   function unmountChildren(children) {
     for (let i = 0; i < children.length; i++) {
       unmount(children[i])
+    }
+  }
+
+  function unmountComponent(instance) {
+    const { bum, scope, update, subTree, um } = instance
+    if (bum) {
+      invokeArrayFns(bum)
+    }
+    if (update) {
+      unmount(subTree)
+    }
+    if (um) {
+      invokeArrayFns(um)
     }
   }
 
