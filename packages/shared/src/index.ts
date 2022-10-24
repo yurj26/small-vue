@@ -67,3 +67,9 @@ export const capitalize = (str: string) =>
  * 添加 on 前缀，并且首字母大写
  */
 export const toHandlerKey = (str: string) => (str ? `on${capitalize(str)}` : ``)
+
+export const invokeArrayFns = (fns: Function[], arg?: any) => {
+  for (let i = 0; i < fns.length; i++) {
+    fns[i](arg)
+  }
+}

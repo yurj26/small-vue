@@ -1,4 +1,4 @@
-import { ShapeFlags } from '@small-vue/shared'
+import { invokeArrayFns, ShapeFlags } from '@small-vue/shared'
 import { isSameVNodeType, Text, Fragment } from './vnode'
 import { createAppAPI } from './apiCreateApp'
 import { createComponentInstance, setupComponent } from './component'
@@ -86,6 +86,7 @@ export const createRenderer = renderOptions => {
   }
 
   function unmount(vnode) {
+    // todo component的卸载
     hostRemove(vnode.el)
   }
 
@@ -489,20 +490,36 @@ export const createRenderer = renderOptions => {
   }
 
   function setupRenderEffect(instance, container, anchor) {
-    const { render } = instance
     function componentUpdateFn() {
       if (!instance.isMounted) {
+        const { bm, m, render } = instance
+        // onBeforeMount
+        if (bm) {
+          invokeArrayFns(bm)
+        }
         const subTree = render.call(instance.proxy)
         patch(null, subTree, container, anchor, instance)
+        // onMounted
+        if (m) {
+          invokeArrayFns(m)
+        }
         instance.subTree = subTree
         instance.isMounted = true
       } else {
-        const { next } = instance
+        const { bu, u, next, render } = instance
         if (next) {
           updateComponentPreRender(instance, next)
         }
+        // onBeforeMount
+        if (bu) {
+          invokeArrayFns(bu)
+        }
         const subTree = render.call(instance.proxy)
         patch(instance.subTree, subTree, container, anchor, instance)
+        // onUpdated
+        if (u) {
+          invokeArrayFns(u)
+        }
         instance.subTree = subTree
       }
     }

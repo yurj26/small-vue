@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+    </div>
+    <script type="module">
+      import { 
+        h, 
+        render, 
+        ref,
+        onBeforeMount,
+        onMounted,
+        onBeforeUpdate,
+        onUpdated,
+        onBeforeUnmount,
+        onUnmounted,
+        reactive
+      } from '../../dist/small-vue.esm-bundler.js'
+
+      const app = document.getElementById('app')
+
+      const componentEl = document.getElementById('component')
+
+      const VueComponent = {
+        setup(props) {
+          onBeforeMount(() => {
+            console.log('onBeforeMount',document.getElementById('component'))
+          })
+          onMounted(() => {
+            console.log('onMounted',document.getElementById('component'))
+          })
+          onBeforeUpdate(() => {
+            console.log('onBeforeUpdate')
+          })
+          onUpdated(() => {
+            console.log('onUpdated')
+          })
+
+          const counter = ref('1')
+          setTimeout(function() {
+            counter.value++
+          }, 1000);
+          return {
+            counter
+          }
+        },
+        render() {
+          return h('h1', { id: 'component' },this.counter)
+        }
+      }
+      render(h(VueComponent), app)
+    </script>
+</html>
