@@ -8,10 +8,8 @@
   <body>
     <div id="app">
     </div>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script type="module">
       import {  h, render, Fragment } from '../../dist/small-vue.esm-bundler.js'
-      // const {  h, render, Fragment  } = Vue
       const app = document.getElementById('app')
       
       render(h(Fragment,[h('h1', 111), h('h2', 222)]), app)

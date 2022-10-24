@@ -8,26 +8,22 @@
   <body>
     <div id="app">
     </div>
-    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
     <script type="module">
-      import {  h, render } from '../../dist/small-vue.esm-bundler.js'
-      // const { h, render, Fragment  } = Vue
+      import { h, render } from '../../dist/small-vue.esm-bundler.js'
       const app = document.getElementById('app')
 
       const VueComponent = {
         name: 'componentName',
         data() {
           return {
-            name: 'yrj',
-            num: 1
+            name: 'yrj'
           }
         },
         render() {
           setTimeout(() =>{
             this.name = 'yrj1'
-            this.num+=1
           }, 1000);
-          return h('h1', this.name + this.num + this.age)
+          return h('h1', this.name + this.$attrs.attr + this.age)
         },
         props: {
           age: {
@@ -36,10 +32,6 @@
           } 
         }
       }
-      render(h(VueComponent, {age: 22, num:123 }), app)
-      // setTimeout(function() {
-      //   render(h(Fragment,[h('h1', 222), h('h2', 222)]), app)
-      // }, 1000);
-
+      render(h(VueComponent, {age: 19, attr: 'attr' }), app)
     </script>
 </html>
