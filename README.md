@@ -39,18 +39,27 @@
 - [x] 支持 Fragment 类型节点
 - [x] h 函数
 - [x] createVNode
-- [x] element patch
-- [x] element diff 算法 双端比较
+- [x] vnode patch
+- [x] diff 算法 双端比较
 - [x] 支持 component
 - [x] 支持 emit
 - [x] 支持 provide/inject
 - [x] 支持 getCurrentInstance
 - [x] 支持 slots
+- [x] 支持 lifecycle
 - [x] 支持 setup 函数
 
 #### runtime-dom
 
 - [x] 支持 custom renderer
+- [x] 支持 patchProp
+- [x] 支持 nodeOps
+- [x] render 函数
+- [x] createApp 函数
+
+#### todo
+
+compiler-core
 
 ### Start
 
