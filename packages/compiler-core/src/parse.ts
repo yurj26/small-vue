@@ -29,6 +29,8 @@ function parseChildren(context, ancestors) {
     let node
     const source = context.source
     if (source.startsWith('{{')) {
+      console.log('处理插值-----------')
+      node = parseInterpolation(context)
     } else if (source.startsWith('<')) {
       if (source[1] === '/') {
         // 处理结束标签
@@ -51,6 +53,36 @@ function parseChildren(context, ancestors) {
     nodes.push(node)
   }
   return nodes
+}
+
+function parseInterpolation(context) {
+  // {{ value }}
+  const openDelimiter = '{{'
+  const closeDelimiter = '}}'
+
+  const closeIndex = context.source.indexOf(
+    closeDelimiter,
+    openDelimiter.length
+  )
+  // 删除 {{
+  advanceBy(context, 2)
+  // 插值内容的长度
+  const rawContentLength = closeIndex - openDelimiter.length
+  // 插值中的内容
+  const rawContent = context.source.slice(0, rawContentLength)
+
+  const preTrimContent = parseTextData(context, rawContent.length)
+  const content = preTrimContent.trim()
+  // 删除 }}
+  advanceBy(context, closeDelimiter.length)
+
+  return {
+    type: NodeTypes.INTERPOLATION,
+    content: {
+      type: NodeTypes.SIMPLE_EXPRESSION,
+      content
+    }
+  }
 }
 
 function parseElement(context, ancestors) {
